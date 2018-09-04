@@ -1,0 +1,10 @@
+/** @format */
+
+.btn {
+  background: none;
+  border: none;
+}
+
+.btn:hover {
+  cursor: pointer;
+}

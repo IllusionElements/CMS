@@ -1,0 +1,37 @@
+/** @format */
+
+import { Blacklist } from '../db'
+import { MongoService } from '../server/Service'
+
+interface Security {
+  validateRole({ user }: { user: string }, role: string): void
+}
+const Accounts = {
+  findUser(id: string, role: string) {
+    return true
+  },
+}
+class SecurityService implements Security {
+  validateRole(member: { user: string }, role: string): void {
+    if (!Accounts.findUser(member.user.id, role)) {
+      throw new Meteor.Error('Access Denied')
+    }
+  }
+}
+class BlacklistService<Schema> extends MongoService<Schema> {
+  protected collection = Blacklist.members
+
+  constructor(private SecurityService: Security) {
+    super()
+  }
+
+  public update(id, modifier, options) {
+    const user = Meteor.userId()
+
+    this.SecurityService.validateRole({ user }, 'admin')
+
+    return super.update(id, modifier, options)
+  }
+
+  find() {}
+}

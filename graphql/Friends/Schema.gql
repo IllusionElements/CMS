@@ -1,0 +1,37 @@
+# @format
+
+enum REP {
+  GoodPlayer
+  NeedsWork
+  AvoidMe
+}
+enum ACCOUNT_TIER {
+  Gold
+  Silver
+}
+
+interface Blacklisted {
+  isBlacklisted: Boolean
+  clanName: String
+}
+
+interface Blacklist {
+  member: Blacklisted
+  clan: Blacklisted
+}
+
+type Friend {
+  id: ID!
+  gamertag: String @alias(field: "Gamertag")
+  gamerscore: String @alias(field: "Gamerscore")
+  GameDisplayPicRaw: String!
+  AccountTier: ACCOUNT_TIER!
+  XboxOneRep: REP
+  blacklist: Blacklist
+  friends: Friend
+}
+
+type FriendResponse {
+  code: Int
+  data: [Friend]
+}

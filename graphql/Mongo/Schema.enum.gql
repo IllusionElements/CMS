@@ -1,0 +1,10 @@
+# @format
+
+enum MONGO_TYPES {
+  STRING
+  BOOLEAN
+  DATE
+  NUMBER
+  NULL
+  ARRAY
+}

@@ -1,0 +1,10 @@
+# @format
+
+type MongoQuery {
+  db(name: String): [Mongo]
+}
+
+type MongoMutation {
+  createDB(name: String, schema: String): Boolean
+  deleteDB(name: String): Boolean
+}

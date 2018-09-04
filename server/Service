@@ -1,0 +1,101 @@
+/** @format */
+
+import { Mongo } from 'meteor/mongo'
+
+type Diff<T, U> = T extends U ? never : T
+
+type ID = string | number | Symbol | Mongo.ObjectID
+
+type Operation<T = number> = {
+  [field: string]: T
+}
+type ConditionalQuery = {
+  $each?: (string | number)[]
+  $sort?: Operation<-1 | 1>
+  $slice?: number
+  $position?: number
+}
+type IS<Schema> = { [P in keyof Schema]?: Schema[P] }
+type Selector<Schema> = Mongo.Modifier<Schema>
+type MongoOptionsType = {
+  multi?: boolean
+  upsert?: boolean
+}
+
+type Upsert = {
+  numberAffected: number
+  insertedID: ID | any
+}
+
+export abstract class MongoService<Schema> {
+  protected abstract collection: Mongo.Collection<Schema>
+
+  public async insert(doc: Schema) {
+    return new Promise<ID>((resolve, reject) =>
+      this.collection.insert(
+        doc,
+        (err, res) => (err ? reject(err) : resolve(res))
+      )
+    )
+  }
+
+  public async update(
+    id:
+      | string
+      | Mongo.ObjectID
+      | Mongo.Query<Schema>
+      | Mongo.QueryWithModifiers<Schema>,
+    modifier: Selector<Schema>,
+    options: MongoOptionsType
+  ): Promise<number> {
+    return new Promise<number>((resolve, reject) =>
+      this.collection.update(
+        id,
+        modifier,
+        options,
+        (err, res) => (err && reject(err)) || resolve(res)
+      )
+    )
+  }
+
+  public async remove(
+    selector:
+      | string
+      | Mongo.ObjectID
+      | Mongo.Query<Schema>
+      | Mongo.QueryWithModifiers<Schema>
+  ): Promise<number> {
+    return new Promise<number>((rs, rj) =>
+      this.collection.remove(selector, (err, r) => (err ? rj(err) : rs(r)))
+    )
+  }
+
+  public async upsert(
+    id:
+      | string
+      | Mongo.ObjectID
+      | Mongo.Query<Schema>
+      | Mongo.QueryWithModifiers<Schema>,
+    modifier: Selector<Schema>,
+    options: { multi: boolean }
+  ) {
+    return new Promise((resolve, reject) =>
+      this.collection.upsert(
+        id,
+        modifier,
+        options,
+        (err, res) => (err ? reject(err) : resolve(res))
+      )
+    )
+  }
+
+  public async getItem(ast) {
+    const tree = this.collection.astToQuery(ast, {})
+  }
+
+  public async getAll() {
+    return this.collection.find({}).fetch()
+  }
+
+  abstract find(): any
+}

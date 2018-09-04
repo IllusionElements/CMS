@@ -1,0 +1,9 @@
+# @format
+
+query getFriendsList($gamertag: Gamertag!) {
+  friendsList(member: $gamertag) {
+    id
+    gamertag
+    gamerscore
+  }
+}

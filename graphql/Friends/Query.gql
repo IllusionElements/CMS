@@ -1,0 +1,16 @@
+# @format
+
+input XUID {
+  xuid: ID
+}
+
+input Gamertag {
+  gamertag: String
+}
+type XboxError {
+  Error: String
+}
+union Result = XboxError | Friend
+type Query {
+  friendsList(member: Gamertag!): [Result]
+}
